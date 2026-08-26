@@ -55,7 +55,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   // ⭐️ 수험자 목록 고정 세팅[cite: 1]
-  const userList = ['전체 수험자', '정진명', '정민규', '언노운'];
+  const userList = ['전체 수험자', '정진명', '정민규','강지원','강지우','언노운'];
 
   const { monday, sunday } = getWeekBoundaries(currentDate);
   const dateRangeText = `${monday.getMonth() + 1}/${String(monday.getDate()).padStart(2, '0')} ~ ${sunday.getMonth() + 1}/${String(sunday.getDate()).padStart(2, '0')}`;
