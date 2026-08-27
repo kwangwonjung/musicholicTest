@@ -112,7 +112,6 @@ export default function DetailedTab() {
       if (Array.isArray(result.data)) {
         setTotalCount(result.data.length);
 
-        // ⭐️ 데이터 가공: 수험자별 [주간 합계(weekly)] 와 [일자별 상세(daily)] 분리 집계
         const grouped: GroupedData = {};
 
         result.data.forEach((item: ApiResponseItem) => {
@@ -144,7 +143,7 @@ export default function DetailedTab() {
             dailySummary.status = status;
           }
 
-          // 2. 주간(Weekly) 집계 처리 (한 주 동안의 모든 데이터를 시험 제목별로 합산)
+          // 2. 주간(Weekly) 집계 처리
           let weeklySummary = grouped[tester].weekly.find(s => s.title === title);
           if (!weeklySummary) {
             weeklySummary = { title, count: 0, maxScore: -1, status: '미사용' };
@@ -195,7 +194,7 @@ export default function DetailedTab() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)]">
-      {/* ⭐️ 상단 고정 영역 */}
+      {/* 상단 고정 영역 */}
       <div className="shrink-0">
         <div className="bg-white p-4 rounded-2xl shadow-sm mb-4 space-y-4">
           <DateRangeFilter
@@ -212,7 +211,7 @@ export default function DetailedTab() {
         </div>
       </div>
 
-      {/* ⭐️ 하단 스크롤 영역 */}
+      {/* 하단 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 pb-4 space-y-4">
         {isLoading ? (
           <div className="text-center py-10 text-gray-400 bg-white rounded-2xl border border-gray-100">
@@ -233,7 +232,7 @@ export default function DetailedTab() {
                 </span>
               </div>
 
-              {/* ⭐️ 1. 주간 합계 영역 (일자별 데이터 상단에 배치) */}
+              {/* ⭐️ 1. 주간 합계 영역 (좌측 제목 / 우측 횟수 & 최고점수 한 줄 표기) */}
               {data.weekly && data.weekly.length > 0 && (
                 <div className="bg-blue-50/50 p-3.5 rounded-2xl border border-blue-100/80 space-y-2">
                   <div className="text-xs font-bold text-blue-600 flex items-center gap-1.5 px-1">
@@ -245,25 +244,18 @@ export default function DetailedTab() {
                         key={idx} 
                         className="flex items-center justify-between bg-white p-3 rounded-xl text-xs transition-all border border-blue-100/60 shadow-xs"
                       >
-                        <div className="space-y-0.5">
-                          <div className="font-semibold text-gray-800 text-[13px]">
-                            {item.title}
-                          </div>
-                          <div className="text-gray-500 text-[11px]">
-                            주간 총 건수: <span className="font-bold text-blue-600">{item.count}건</span>
-                          </div>
+                        {/* 좌측: 시험 제목 */}
+                        <div className="font-semibold text-gray-800 text-[13px]">
+                          {item.title}
                         </div>
 
+                        {/* 우측: 횟수와 최고 점수를 한 줄로 표기 */}
                         <div className="flex items-center gap-3">
+                          <span className="text-gray-500 font-medium">
+                            {item.count}건
+                          </span>
                           <span className={`font-bold text-sm ${getScoreColor(item.maxScore)}`}>
                             최고 {item.maxScore}점
-                          </span>
-                          <span className={`px-2.5 py-1 rounded-full text-[11px] font-medium border ${
-                            item.status === '사용'
-                              ? 'border-blue-300 text-blue-500 bg-blue-50'
-                              : 'border-gray-200 text-gray-500 bg-gray-50'
-                          }`}>
-                            {item.status}
                           </span>
                         </div>
                       </div>
@@ -272,7 +264,7 @@ export default function DetailedTab() {
                 </div>
               )}
 
-              {/* ⭐️ 2. 일자별 상세 영역 */}
+              {/* ⭐️ 2. 일자별 상세 영역 (기존 형태 유지) */}
               <div className="space-y-4 pt-1">
                 <div className="text-xs font-bold text-gray-400 px-1">
                   일자별 상세
@@ -331,4 +323,4 @@ export default function DetailedTab() {
       </div>
     </div>
   );
-}
+} 
