@@ -216,7 +216,7 @@ export default function WeeklyTab() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)]">
-      {/* ⭐️ 상단 고정 영역 (필터 + 수정모드 버튼) */}
+      {/* ⭐️ 상단 고정 영역 (필터 + 좌측 총 건수 / 우측 수정모드 버튼) */}
       <div className="shrink-0">
         <div className="bg-white p-4 rounded-2xl shadow-sm mb-2 space-y-4">
           <StatusFilter selectedStatus={status} onChangeStatus={setStatus} />
@@ -233,7 +233,12 @@ export default function WeeklyTab() {
           />
         </div>
 
-        <div className="flex justify-end mb-3">
+        {/* ⭐️ 좌측 총 건수, 우측 수정모드 버튼 배치 */}
+        <div className="flex justify-between items-center mb-3 px-1">
+          <div className="text-xs font-medium text-gray-500">
+            총 건수: <span className="font-bold text-gray-800">{records.length}건</span>
+          </div>
+
           {isEditMode ? (
             <button
               onClick={handleSaveComplete}
