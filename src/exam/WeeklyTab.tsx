@@ -157,7 +157,6 @@ export default function WeeklyTab() {
     setRecords(prev => prev.map(item => item.id === id ? { ...item, name: newName } : item));
   };
 
-  // ⭐️ 상태 양방향 토글 핸들러 ('사용' <-> '미사용')
   const handleStatusToggle = (id: number) => {
     setRecords(prev => prev.map(item => {
       if (item.id === id) {
@@ -216,58 +215,65 @@ export default function WeeklyTab() {
   };
 
   return (
-    <>
-      <div className="bg-white p-4 rounded-2xl shadow-sm mb-2 space-y-4">
-        <StatusFilter selectedStatus={status} onChangeStatus={setStatus} />
-        <DateRangeFilter
-          dateRange={dateRangeText}
-          onPrev={handlePrevWeek}
-          onNext={handleNextWeek}
-          onThisWeek={handleThisWeek}
-        />
-        <UserSelectFilter
-          users={userList}
-          selectedUser={selectedUser}
-          onChangeUser={setSelectedUser}
-        />
+    <div className="flex flex-col h-[calc(100vh-100px)]">
+      {/* ⭐️ 상단 고정 영역 (필터 + 수정모드 버튼) */}
+      <div className="shrink-0">
+        <div className="bg-white p-4 rounded-2xl shadow-sm mb-2 space-y-4">
+          <StatusFilter selectedStatus={status} onChangeStatus={setStatus} />
+          <DateRangeFilter
+            dateRange={dateRangeText}
+            onPrev={handlePrevWeek}
+            onNext={handleNextWeek}
+            onThisWeek={handleThisWeek}
+          />
+          <UserSelectFilter
+            users={userList}
+            selectedUser={selectedUser}
+            onChangeUser={setSelectedUser}
+          />
+        </div>
+
+        <div className="flex justify-end mb-3">
+          {isEditMode ? (
+            <button
+              onClick={handleSaveComplete}
+              className="px-4 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-red-600 transition-all cursor-pointer"
+            >
+              수정 완료
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-blue-700 transition-all cursor-pointer"
+            >
+              수정모드
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex justify-end mb-3">
-        {isEditMode ? (
-          <button
-            onClick={handleSaveComplete}
-            className="px-4 py-1.5 bg-red-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-red-600 transition-all cursor-pointer"
-          >
-            수정 완료
-          </button>
+      {/* ⭐️ 하단 스크롤 영역 (그리드 리스트 영역만 스크롤 발생) */}
+      <div className="flex-1 overflow-y-auto min-h-0 pr-1 pb-4">
+        {isLoading ? (
+          <div className="text-center py-10 text-gray-400 bg-white rounded-2xl border border-gray-100">
+            데이터를 처리하는 중입니다...
+          </div>
+        ) : records.length > 0 ? (
+          <RecordList 
+            records={records} 
+            isEditMode={isEditMode}
+            userList={userList}
+            onUserChange={handleUserChange}
+            onStatusToggle={handleStatusToggle}
+          />
         ) : (
-          <button
-            onClick={() => setIsPasswordModalOpen(true)}
-            className="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-blue-700 transition-all cursor-pointer"
-          >
-            수정모드
-          </button>
+          <div className="text-center py-10 text-gray-400 bg-white rounded-2xl border border-gray-100">
+            해당 조건에 등록된 데이터가 없습니다.
+          </div>
         )}
       </div>
 
-      {isLoading ? (
-        <div className="text-center py-10 text-gray-400 bg-white rounded-2xl border border-gray-100">
-          데이터를 처리하는 중입니다...
-        </div>
-      ) : records.length > 0 ? (
-        <RecordList 
-          records={records} 
-          isEditMode={isEditMode}
-          userList={userList}
-          onUserChange={handleUserChange}
-          onStatusToggle={handleStatusToggle}
-        />
-      ) : (
-        <div className="text-center py-10 text-gray-400 bg-white rounded-2xl border border-gray-100">
-          해당 조건에 등록된 데이터가 없습니다.
-        </div>
-      )}
-
+      {/* 비밀번호 입력 레이어 팝업 Modal */}
       {isPasswordModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl space-y-4">
@@ -305,6 +311,6 @@ export default function WeeklyTab() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
