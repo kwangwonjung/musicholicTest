@@ -5,7 +5,7 @@ import MonthlyTab from './exam/MonthlyTab';
 import DetailTab from './exam/DetailTab';  
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'주별' | '월별' | '상세'>('주별');
+  const [activeTab, setActiveTab] = useState<'주별' | '월별' | '요약'>('주별');
 
   return (
     <main className="max-w-md mx-auto bg-gray-50 min-h-screen p-4 text-sm font-sans">
@@ -28,19 +28,19 @@ export default function App() {
           월별
         </button>
         <button 
-          onClick={() => setActiveTab('상세')}
+          onClick={() => setActiveTab('요약')}
           className={`flex-1 py-3 font-bold transition-all ${
-            activeTab === '상세' ? 'bg-white shadow-sm text-black' : 'text-gray-500'
+            activeTab === '요약' ? 'bg-white shadow-sm text-black' : 'text-gray-500'
           }`}
         >
-          상세
+          요약
         </button>
       </div>
 
       {/* 선택된 탭에 따른 컴포넌트 렌더링 */}
       {activeTab === '주별' && <WeeklyTab />}
       {activeTab === '월별' && <MonthlyTab />}
-      {activeTab === '상세' && <DetailTab />}
+      {activeTab === '요약' && <DetailTab />}
     </main>
   );
 }
