@@ -28,10 +28,10 @@ export default function RecordList({
       {records.map((record) => (
         <div
           key={record.id}
-          className="grid grid-cols-[auto_auto_1fr_1fr_1fr] gap-x-2 gap-y-2 items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100"
+          className="grid grid-cols-[auto_1fr_1fr_1fr] gap-x-2 gap-y-2 items-center bg-white p-4 rounded-2xl shadow-sm border border-gray-100"
         >
-          {/* 좌측: 이름 (수정모드일 때 콤보박스로 변경) */}
-          <div className="row-span-2 font-bold text-gray-800 whitespace-nowrap text-center px-1">
+          {/* 1행 좌측: 이름 (사자성어 타이틀과 높이 일치) */}
+          <div className="font-bold text-gray-800 whitespace-nowrap text-center px-2 border-r border-gray-100">
             {isEditMode ? (
               <select
                 value={record.name}
@@ -49,27 +49,27 @@ export default function RecordList({
             )}
           </div>
 
-          {/* 좌측: 날짜 */}
-          <div className="row-span-2 text-gray-500 text-xs whitespace-nowrap text-center px-2 border-r border-gray-100">
-            {record.date}
-          </div>
-
-          {/* 우측 상단: 시험 제목 */}
+          {/* 1행 우측: 시험 제목 (사자성어) */}
           <div className="col-span-3 text-gray-700 text-[13px] font-medium text-center pb-1">
             {record.title}
           </div>
 
-          {/* 우측 하단 1: 점수 */}
+          {/* 2행 좌측: 날짜 (점수/시간과 높이 일치) */}
+          <div className="text-gray-500 text-xs whitespace-nowrap text-center px-2 border-r border-gray-100">
+            {record.date}
+          </div>
+
+          {/* 2행 우측 1: 점수 */}
           <div className={`text-center font-bold text-sm ${getScoreColor(record.score)}`}>
             {record.score}점
           </div>
 
-          {/* 우측 하단 2: 시간 */}
+          {/* 2행 우측 2: 시간 */}
           <div className="text-gray-400 text-xs text-center">
             {record.time}
           </div>
 
-          {/* 우측 하단 3: 상태 뱃지 (수정모드일 때 클릭하면 사용 <-> 미사용 양방향 토글) */}
+          {/* 2행 우측 3: 상태 뱃지 */}
           <div className="flex justify-center">
             <button
               type="button"
