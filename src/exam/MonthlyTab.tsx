@@ -90,7 +90,7 @@ export default function MonthlyTab() {
           </div>
           <button
             onClick={handleSearch}
-            className="shrink-0 flex items-center justify-center w-[42px] h-[42px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
+            className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
             title="조회"
           >
             <svg 
@@ -113,7 +113,6 @@ export default function MonthlyTab() {
 
       {/* 사용 현황 카드 영역 (평균 점수 제외, 3개 배치) */}
       <div className="bg-white p-4 rounded-2xl shadow-sm space-y-3">
-        <div className="text-xs font-bold text-gray-700">{year}년 {month}월 사용 현황</div>
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex flex-col items-center justify-center">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mb-1 text-blue-600">

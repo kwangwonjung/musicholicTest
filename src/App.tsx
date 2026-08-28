@@ -8,7 +8,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'주별' | '요약' | '월별'>('주별');
 
   return (
-    <main className="max-w-md mx-auto bg-gray-50 min-h-screen p-2 text-sm font-sans">
+    <main className="max-w-md mx-auto bg-gray-50 min-h-screen py-2 px-4 text-sm font-sans">
       {/* 탭 네비게이션 버튼 영역 (주별, 요약, 월별 순서) */}
       <div className="flex bg-gray-200 rounded-lg overflow-hidden mb-2 cursor-pointer">
         <button 
