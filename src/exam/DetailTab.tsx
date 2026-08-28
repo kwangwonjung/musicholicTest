@@ -31,6 +31,7 @@ interface TesterDailyGroup {
 interface TesterProcessedData {
   weekly: DetailSummaryItem[];
   daily: TesterDailyGroup;
+  totalTesterCount: number; // 수험자별 총 건수 저장을 위한 필드 추가
 }
 
 interface GroupedData {
@@ -65,7 +66,6 @@ export default function DetailedTab() {
   const [selectedUser, setSelectedUser] = useState('전체 수험자');
   
   const [groupedData, setGroupedData] = useState<GroupedData>({});
-  const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const userList = ['전체 수험자', '정진명', '정민규','강지원','강지우','언노운'];
@@ -108,8 +108,6 @@ export default function DetailedTab() {
       }
       
       if (Array.isArray(result.data)) {
-        setTotalCount(result.data.length);
-
         const grouped: GroupedData = {};
 
         result.data.forEach((item: ApiResponseItem) => {
@@ -122,9 +120,14 @@ export default function DetailedTab() {
           if (!grouped[tester]) {
             grouped[tester] = {
               weekly: [],
-              daily: {}
+              daily: {},
+              totalTesterCount: 0 // 초기화
             };
           }
+
+          // 수험자별 전체 API 데이터 건수 카운트 증가
+          grouped[tester].totalTesterCount += 1;
+
           if (!grouped[tester].daily[date]) {
             grouped[tester].daily[date] = [];
           }
@@ -217,14 +220,14 @@ export default function DetailedTab() {
           Object.entries(groupedData).map(([tester, data]) => (
             <div key={tester} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-5">
               
-              {/* 수험자 이름 헤더 */}
+              {/* 수험자 이름 헤더 (수험자별 총 건수로 표기 변경) */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-600"></span>
                   {tester}
                 </h3>
                 <span className="text-xs text-gray-400 font-medium">
-                  총 건수: {totalCount}건
+                  총 건수: {data.totalTesterCount}건
                 </span>
               </div>
 
@@ -257,7 +260,7 @@ export default function DetailedTab() {
                 </div>
               )}
 
-              {/* ⭐️ 일자별 상세 영역 (날짜 아래에 학습 내용 카드가 한 줄씩 오도록 변경) */}
+              {/* 일자별 상세 영역 */}
               <div className="space-y-4 pt-1">
                 <div className="text-xs font-bold text-gray-400 px-1">
                   일자별 상세
@@ -265,12 +268,10 @@ export default function DetailedTab() {
                 {Object.entries(data.daily).map(([date, items]) => (
                   <div key={date} className="space-y-2 pt-3 border-t border-gray-50 first:border-t-0 first:pt-0">
                     
-                    {/* 날짜를 위쪽 행에 독립적으로 배치 */}
                     <div className="text-xs font-semibold text-gray-500 px-1">
                       {date}
                     </div>
 
-                    {/* 해당 날짜의 학습 내용 목록 (세로로 한 줄씩 꽉 차게 배치) */}
                     <div className="space-y-2">
                       {items.map((item, idx) => (
                         <div 
