@@ -17,7 +17,6 @@ interface ApiResponseItem {
   USE_YN: string;
 }
 
-// 요약된 상세 아이템 타입 정의 (건수, 최고점수, 해당 상태)
 interface DetailSummaryItem {
   title: string;
   count: number;
@@ -29,7 +28,6 @@ interface TesterDailyGroup {
   [date: string]: DetailSummaryItem[];
 }
 
-// 주간 합계와 일자별 상세를 함께 담는 구조
 interface TesterProcessedData {
   weekly: DetailSummaryItem[];
   daily: TesterDailyGroup;
@@ -131,7 +129,6 @@ export default function DetailedTab() {
             grouped[tester].daily[date] = [];
           }
 
-          // 1. 일자별(Daily) 집계 처리
           let dailySummary = grouped[tester].daily[date].find(s => s.title === title);
           if (!dailySummary) {
             dailySummary = { title, count: 0, maxScore: -1, status: '미사용' };
@@ -143,7 +140,6 @@ export default function DetailedTab() {
             dailySummary.status = status;
           }
 
-          // 2. 주간(Weekly) 집계 처리
           let weeklySummary = grouped[tester].weekly.find(s => s.title === title);
           if (!weeklySummary) {
             weeklySummary = { title, count: 0, maxScore: -1, status: '미사용' };
@@ -232,7 +228,7 @@ export default function DetailedTab() {
                 </span>
               </div>
 
-              {/* ⭐️ 1. 주간 합계 영역 (좌측 제목 / 우측 횟수 & 최고점수 한 줄 표기) */}
+              {/* 주간 합계 영역 */}
               {data.weekly && data.weekly.length > 0 && (
                 <div className="bg-blue-50/50 p-3.5 rounded-2xl border border-blue-100/80 space-y-2">
                   <div className="text-xs font-bold text-blue-600 flex items-center gap-1.5 px-1">
@@ -244,12 +240,9 @@ export default function DetailedTab() {
                         key={idx} 
                         className="flex items-center justify-between bg-white p-3 rounded-xl text-xs transition-all border border-blue-100/60 shadow-xs"
                       >
-                        {/* 좌측: 시험 제목 */}
                         <div className="font-semibold text-gray-800 text-[13px]">
                           {item.title}
                         </div>
-
-                        {/* 우측: 횟수와 최고 점수를 한 줄로 표기 */}
                         <div className="flex items-center gap-3">
                           <span className="text-gray-500 font-medium">
                             {item.count}건
@@ -264,25 +257,25 @@ export default function DetailedTab() {
                 </div>
               )}
 
-              {/* ⭐️ 2. 일자별 상세 영역 (기존 형태 유지) */}
+              {/* ⭐️ 일자별 상세 영역 (날짜 아래에 학습 내용 카드가 한 줄씩 오도록 변경) */}
               <div className="space-y-4 pt-1">
                 <div className="text-xs font-bold text-gray-400 px-1">
                   일자별 상세
                 </div>
                 {Object.entries(data.daily).map(([date, items]) => (
-                  <div key={date} className="grid grid-cols-[100px_1fr] gap-4 items-start pt-3 border-t border-gray-50 first:border-t-0 first:pt-0">
+                  <div key={date} className="space-y-2 pt-3 border-t border-gray-50 first:border-t-0 first:pt-0">
                     
-                    {/* 날짜 */}
-                    <div className="text-xs font-semibold text-gray-500 pt-1">
+                    {/* 날짜를 위쪽 행에 독립적으로 배치 */}
+                    <div className="text-xs font-semibold text-gray-500 px-1">
                       {date}
                     </div>
 
-                    {/* 해당 날짜의 시험별 요약 목록 */}
+                    {/* 해당 날짜의 학습 내용 목록 (세로로 한 줄씩 꽉 차게 배치) */}
                     <div className="space-y-2">
                       {items.map((item, idx) => (
                         <div 
                           key={idx} 
-                          className="flex items-center justify-between bg-gray-50/70 hover:bg-gray-50 p-3 rounded-xl text-xs transition-all border border-gray-100/50"
+                          className="flex items-center justify-between bg-gray-50/70 hover:bg-gray-50 p-3 rounded-xl text-xs transition-all border border-gray-100/50 w-full"
                         >
                           <div className="space-y-0.5">
                             <div className="font-medium text-gray-800 text-[13px]">
@@ -323,4 +316,4 @@ export default function DetailedTab() {
       </div>
     </div>
   );
-} 
+}
