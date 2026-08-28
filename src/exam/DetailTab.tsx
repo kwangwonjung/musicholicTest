@@ -202,11 +202,39 @@ export default function DetailedTab() {
             onNext={handleNextWeek}
             onThisWeek={handleThisWeek}
           />
-          <UserSelectFilter
-            users={userList}
-            selectedUser={selectedUser}
-            onChangeUser={setSelectedUser}
-          />
+          {/* ⭐️ UserSelectFilter와 독립된 돋보기 버튼 가로 배치 */}
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <UserSelectFilter
+                users={userList}
+                selectedUser={selectedUser}
+                onChangeUser={setSelectedUser}
+              />
+            </div>
+            
+            <button
+              onClick={fetchExamStatus}
+              /* ⭐️ 사이즈 수정됨: w-11 h-11 -> w-[42px] h-[42px] (수험자 콤보박스 높이와 일치) */
+              className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
+              title="조회"
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                />
+              </svg>
+            </button>
+          </div>
+
         </div>
       </div>
 
