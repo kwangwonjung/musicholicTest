@@ -68,7 +68,7 @@ export default function RecordList({
             </div>
 
             {/* 2열: 점수 + 시간 */}
-            <div className="flex flex-col gap-1 items-start w-[60px] pl-4 shrink-0 whitespace-nowrap">
+            <div className="flex flex-col gap-1 items-start w-[60px] pl-2 shrink-0 whitespace-nowrap">
               <span className={`font-bold text-sm ${getScoreColor(record.score)}`}>
                 {record.score}점
               </span>
