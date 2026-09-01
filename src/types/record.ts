@@ -1,10 +1,11 @@
-// src/types/record.ts
 export interface RecordType {
   id: number;
   name: string;
-  date: string;
   title: string;
+  date: string;
   score: number;
   time: string;
-  status: '사용' | '미사용';
+  status: string;
+  mode: string;       // 추가
+  hintCnt: number;  // 추가
 }

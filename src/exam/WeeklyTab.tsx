@@ -18,6 +18,9 @@ interface ApiResponseItem {
   DURATION: string;
   CREATED_AT: string;
   USE_YN: string;
+  MODE: string;
+  HINT_CNT: number;
+
 }
 
 const getWeekBoundaries = (date: Date) => {
@@ -109,6 +112,8 @@ export default function WeeklyTab() {
           title: item.TEST_GRP_NM,
           score: item.TEST_SCORE,
           time: item.DURATION,
+          mode: item.MODE,
+          hintCnt: item.HINT_CNT,
           status: item.USE_YN === 'Y' ? '사용' : '미사용',
         }));
 
