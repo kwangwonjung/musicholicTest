@@ -1,12 +1,83 @@
 // src/exam/MonthlyTab.tsx
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import UserSelectFilter from '../components/UserSelectFilter';
 
 export default function MonthlyTab() {
-  const [selectedUser, setSelectedUser] = useState('전체 수험자');
-  const [currentDate, setCurrentDate] = useState(new Date(2024, 7, 1)); // 2024년 8월 기준 하드코딩
+  const [selectedUser, setSelectedUser] = useState('정진명');
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1)); // 2026년 8월 기준
+  const [calendarDays, setCalendarDays] = useState<any[]>([]);
+  const [summary, setSummary] = useState({ total_solves: 0, unique_subjects: 0, attendance_days: 0 });
+  const [loading, setLoading] = useState(false);
 
   const userList = ['정진명', '정민규', '강지원', '강지우', '언노운'];
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+
+  // 캘린더 및 월별 합계 데이터를 병렬로 조회하는 함수
+  const fetchMonthlyData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+      const formattedMonth = String(month).padStart(2, '0');
+      const payload = {
+        year: String(year),
+        month: formattedMonth,
+        tester: selectedUser === '전체 수험자' ? '정진명' : selectedUser,
+      };
+
+      // 2개의 API를 병렬로 동시 호출
+      const [calendarRes, summaryRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/examstatus/selectMonthlyCalendar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }),
+        fetch(`${API_BASE_URL}/api/examstatus/selectMonthlySum`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }),
+      ]);
+
+      const calendarResult = await calendarRes.json();
+      const summaryResult = await summaryRes.json();
+
+      // 1. 캘린더 데이터 바인딩
+      if (calendarResult.success && Array.isArray(calendarResult.data)) {
+        const formattedDays = calendarResult.data.map((item: any) => {
+          const dayNum = parseInt(item.day.split('-')[2], 10);
+          const countVal = Number(item.count || 0);
+
+          return {
+            day: dayNum,
+            current: item.current,
+            count: item.current ? (countVal > 0 ? `${countVal}회` : '-') : null,
+            attendance: item.current ? countVal > 0 : false,
+          };
+        });
+        setCalendarDays(formattedDays);
+      } else {
+        console.error('달력 데이터 조회 실패:', calendarResult.message);
+      }
+
+      // 2. 월별 합계 데이터 바인딩
+      if (summaryResult.success && summaryResult.data?.[0]) {
+        setSummary(summaryResult.data[0]);
+      } else {
+        console.error('월별 합계 데이터 조회 실패:', summaryResult.message);
+      }
+    } catch (error) {
+      console.error('API 호출 에러:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [year, month, selectedUser]);
+
+  // 연도/월 또는 수험자가 변경될 때 자동 조회
+  useEffect(() => {
+    fetchMonthlyData();
+  }, [fetchMonthlyData]);
 
   const handlePrevMonth = () => {
     const prev = new Date(currentDate);
@@ -20,54 +91,8 @@ export default function MonthlyTab() {
     setCurrentDate(next);
   };
 
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-
-  // 하드코딩된 2024년 8월 달력 데이터 (이미지 기준 매칭)
-  const calendarDays = [
-    { day: 28, count: null, current: false, attendance: false },
-    { day: 29, count: null, current: false, attendance: false },
-    { day: 30, count: null, current: false, attendance: false },
-    { day: 31, count: null, current: false, attendance: false },
-    { day: 1, count: '-', current: true, attendance: false },
-    { day: 2, count: '-', current: true, attendance: false },
-    { day: 3, count: '1회', current: true, attendance: true },
-    
-    { day: 4, count: '-', current: true, attendance: false },
-    { day: 5, count: '1회', current: true, attendance: true },
-    { day: 6, count: '2회', current: true, attendance: true },
-    { day: 7, count: '-', current: true, attendance: false },
-    { day: 8, count: '-', current: true, attendance: false },
-    { day: 9, count: '1회', current: true, attendance: true },
-    { day: 10, count: '1회', current: true, attendance: true },
-
-    { day: 11, count: '-', current: true, attendance: false },
-    { day: 12, count: '2회', current: true, attendance: true },
-    { day: 13, count: '-', current: true, attendance: false },
-    { day: 14, count: '1회', current: true, attendance: true },
-    { day: 15, count: '-', current: true, attendance: false },
-    { day: 16, count: '1회', current: true, attendance: true },
-    { day: 17, count: '-', current: true, attendance: false },
-
-    { day: 18, count: '1회', current: true, attendance: true },
-    { day: 19, count: '-', current: true, attendance: false },
-    { day: 20, count: '2회', current: true, attendance: true },
-    { day: 21, count: '-', current: true, attendance: false },
-    { day: 22, count: '1회', current: true, attendance: true },
-    { day: 23, count: '-', current: true, attendance: false },
-    { day: 24, count: '1회', current: true, attendance: true },
-
-    { day: 25, count: '-', current: true, attendance: false },
-    { day: 26, count: '-', current: true, attendance: false },
-    { day: 27, count: '1회', current: true, attendance: true },
-    { day: 28, count: '1회', current: true, attendance: true, selected: true },
-    { day: 29, count: '-', current: true, attendance: false },
-    { day: 30, count: '-', current: true, attendance: false },
-    { day: 31, count: '-', current: true, attendance: false },
-  ];
-
   const handleSearch = () => {
-    alert(`${year}년 ${month}월 데이터를 조회합니다.`);
+    fetchMonthlyData();
   };
 
   const handleDayClick = (dayObj: any) => {
@@ -90,7 +115,8 @@ export default function MonthlyTab() {
           </div>
           <button
             onClick={handleSearch}
-            className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
+            disabled={loading}
+            className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50"
             title="조회"
           >
             <svg 
@@ -111,7 +137,7 @@ export default function MonthlyTab() {
         </div>
       </div>
 
-      {/* 사용 현황 카드 영역 (평균 점수 제외, 3개 배치) */}
+      {/* 사용 현황 카드 영역 (월별 합계 데이터 연동) */}
       <div className="bg-white p-4 rounded-2xl shadow-sm space-y-3">
         <div className="grid grid-cols-3 gap-2">
           <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex flex-col items-center justify-center">
@@ -119,7 +145,7 @@ export default function MonthlyTab() {
               📄
             </div>
             <span className="text-[11px] text-gray-500 font-medium">총 풀이 횟수</span>
-            <span className="text-sm font-bold text-blue-600">12회</span>
+            <span className="text-sm font-bold text-blue-600">{summary.total_solves}회</span>
           </div>
 
           <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3 flex flex-col items-center justify-center">
@@ -127,7 +153,7 @@ export default function MonthlyTab() {
               📖
             </div>
             <span className="text-[11px] text-gray-500 font-medium">과목 수</span>
-            <span className="text-sm font-bold text-emerald-600">4과목</span>
+            <span className="text-sm font-bold text-emerald-600">{summary.unique_subjects}과목</span>
           </div>
 
           <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-3 flex flex-col items-center justify-center">
@@ -135,7 +161,7 @@ export default function MonthlyTab() {
               📅
             </div>
             <span className="text-[11px] text-gray-500 font-medium">출석 일수</span>
-            <span className="text-sm font-bold text-orange-600">8일</span>
+            <span className="text-sm font-bold text-orange-600">{summary.attendance_days}일</span>
           </div>
         </div>
       </div>
@@ -202,15 +228,7 @@ export default function MonthlyTab() {
           </div>
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 bg-blue-100 rounded-full"></span>
-            <span>1회</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-emerald-100 rounded-full"></span>
-            <span>2~3회</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 bg-purple-100 rounded-full"></span>
-            <span>4회 이상</span>
+            <span>1회 이상</span>
           </div>
           <div className="flex items-center gap-1">
             <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
