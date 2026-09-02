@@ -4,7 +4,21 @@ import UserSelectFilter from '../components/UserSelectFilter';
 
 export default function MonthlyTab() {
   const [selectedUser, setSelectedUser] = useState('정진명');
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 7, 1)); // 2026년 8월 기준
+  
+  // 20일 기준 디폴트 월 설정 (20일 초과: 현재월, 20일 이하: 전월)
+  const [currentDate, setCurrentDate] = useState(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth(); // 0-indexed (0~11)
+    const day = now.getDate();
+
+    if (day > 20) {
+      return new Date(year, month, 1);
+    } else {
+      return new Date(year, month - 1, 1);
+    }
+  });
+
   const [calendarDays, setCalendarDays] = useState<any[]>([]);
   const [summary, setSummary] = useState({ total_solves: 0, unique_subjects: 0, attendance_days: 0 });
   const [loading, setLoading] = useState(false);
@@ -97,14 +111,14 @@ export default function MonthlyTab() {
 
   const handleDayClick = (dayObj: any) => {
     if (dayObj.current && dayObj.count !== '-') {
-      alert(`${year}년 ${month}월 ${dayObj.day}일의 문제 풀이 목록을 확인합니다.`);
+      alert(`${year}년 ${month}월 ${dayObj.day}일의 문제 풀이 목록을 확인할 수 있습니다.`);
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] space-y-3 overflow-y-auto pb-6">
-      {/* 상단 수험자 필터 및 돋보기 버튼 영역 */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm">
+    <div className="flex flex-col h-[calc(100vh-100px)] space-y-1 overflow-y-auto pb-6">
+      {/* 수험자 필터 및 사용 현황 카드 통합 영역 */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm space-y-1">
         <div className="flex items-center gap-2">
           <div className="flex-1">
             <UserSelectFilter
@@ -135,11 +149,8 @@ export default function MonthlyTab() {
             </svg>
           </button>
         </div>
-      </div>
 
-      {/* 사용 현황 카드 영역 (월별 합계 데이터 연동) */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm space-y-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 pt-1">
           <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex flex-col items-center justify-center">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mb-1 text-blue-600">
               📄
