@@ -1,6 +1,7 @@
 // src/exam/MonthlyTab.tsx
 import { useState, useEffect, useCallback } from 'react';
 import UserSelectFilter from '../components/UserSelectFilter';
+import MonthlyDetailLayer from '../exam/MonthlyDetailLayer'; // 모달 컴포넌트 임포트
 
 export default function MonthlyTab() {
   const [selectedUser, setSelectedUser] = useState('정진명');
@@ -22,6 +23,10 @@ export default function MonthlyTab() {
   const [calendarDays, setCalendarDays] = useState<any[]>([]);
   const [summary, setSummary] = useState({ total_solves: 0, unique_subjects: 0, attendance_days: 0 });
   const [loading, setLoading] = useState(false);
+
+  // 모달 팝업 상태 및 선택된 날짜 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(1);
 
   const userList = ['정진명', '정민규', '강지원', '강지우', '언노운'];
 
@@ -111,12 +116,13 @@ export default function MonthlyTab() {
 
   const handleDayClick = (dayObj: any) => {
     if (dayObj.current && dayObj.count !== '-') {
-      alert(`${year}년 ${month}월 ${dayObj.day}일의 문제 풀이 목록을 확인할 수 있습니다.`);
+      setSelectedDay(dayObj.day); // 클릭한 날짜 설정
+      setIsModalOpen(true);      // 모달 오픈
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-100px)] space-y-1 overflow-y-auto pb-6">
+    <div className="flex flex-col h-[calc(100vh-100px)] space-y-1 overflow-y-auto pb-6 relative">
       {/* 수험자 필터 및 사용 현황 카드 통합 영역 */}
       <div className="bg-white p-4 rounded-2xl shadow-sm space-y-1">
         <div className="flex items-center gap-2">
@@ -206,7 +212,7 @@ export default function MonthlyTab() {
               onClick={() => handleDayClick(item)}
               className={`flex flex-col items-center justify-center py-1.5 rounded-xl transition-all ${
                 item.selected ? 'bg-blue-50 border border-blue-200' : 'hover:bg-gray-50'
-              } ${item.current ? 'cursor-pointer' : 'opacity-40'}`}
+              } ${item.current && item.count !== '-' ? 'cursor-pointer' : item.current ? 'cursor-default' : 'opacity-40'}`}
             >
               <span className={`font-semibold ${
                 index % 7 === 0 ? 'text-red-500' : index % 7 === 6 ? 'text-blue-500' : 'text-gray-700'
@@ -255,6 +261,16 @@ export default function MonthlyTab() {
           <strong className="font-bold">TIP</strong> 날짜를 클릭하면 해당 날짜의 문제 풀이 목록을 확인할 수 있어요.
         </div>
       </div>
+
+      {/* 분리된 레이어 팝업 컴포넌트 */}
+      <MonthlyDetailLayer
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        year={year}
+        month={month}
+        day={selectedDay}
+        selectedUser={selectedUser}
+      />
     </div>
   );
 }
