@@ -73,8 +73,9 @@ export default function RecordList({
 
             {/* 3열: 힌트 + 상태 뱃지 */}
             <div className="flex flex-col gap-1 items-end w-[50px] pl-4 shrink-0 whitespace-nowrap">
+              
               <span className="text-gray-500 text-xs">
-                H: {record.hintCnt ?? 0}
+                 💡 {record.hintCnt ?? 0}
               </span>
               <div>
                 <button
