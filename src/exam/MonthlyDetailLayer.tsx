@@ -1,5 +1,6 @@
 // src/components/MonthlyDetailLayer.tsx
 import { useState, useEffect } from 'react';
+import { getScoreColor } from '../utils/scoreUtils'; // 공통 유틸 함수 import 경로에 맞게 조정해주세요
 
 interface MonthlyDetailLayerProps {
   isOpen: boolean;
@@ -91,6 +92,8 @@ export default function MonthlyDetailLayer({ isOpen, onClose, year, month, day, 
                 ? 'bg-blue-100 text-blue-700' 
                 : 'bg-purple-100 text-purple-700';
 
+              const scoreValue = Number(item.TEST_SCORE) || 0;
+
               return (
                 <div 
                   key={index} 
@@ -108,10 +111,12 @@ export default function MonthlyDetailLayer({ isOpen, onClose, year, month, day, 
                     </div>
                   </div>
 
-                  {/* 오른쪽 영역 (상단: 점수 & 힌트 / 하단: 시간) - 항상 일정한 위치에서 시작 */}
+                  {/* 오른쪽 영역 (상단: 점수 & 힌트 / 하단: 시간) */}
                   <div className="space-y-2 flex flex-col items-end">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-red-500">{item.TEST_SCORE}점</span>
+                      <span className={`text-sm font-bold ${getScoreColor(scoreValue)}`}>
+                        {item.TEST_SCORE}점
+                      </span>
                       <div className="flex items-center gap-1 text-[11px] text-gray-500">
                         <span>💡</span>
                         <span className="font-semibold text-gray-700">{item.HINT_CNT ?? 0}</span>

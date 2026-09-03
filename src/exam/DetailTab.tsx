@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import DateRangeFilter from '../components/DateRangeFilter';
 import UserSelectFilter from '../components/UserSelectFilter';
+import { getScoreColor } from '../utils/scoreUtils'; // ⭐️ 공통 유틸 함수 임포트[cite: 7]
 
 interface ApiResponseItem {
   SEQ: number;
@@ -31,7 +32,7 @@ interface TesterDailyGroup {
 interface TesterProcessedData {
   weekly: DetailSummaryItem[];
   daily: TesterDailyGroup;
-  totalTesterCount: number; // 수험자별 총 건수 저장을 위한 필드 추가
+  totalTesterCount: number;
 }
 
 interface GroupedData {
@@ -59,6 +60,16 @@ const formatDate = (date: Date) => {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+};
+
+// ⭐️ 시험 모드별 우선순위 정의 맵핑
+const modePriority: { [key: string]: number } = {
+  '주관식 (한 → 영)': 1,
+  '주관식': 2,
+  '주관식 (영 → 한)': 3,
+  '객관식 (한 → 영)': 4,
+  '객관식 (영 → 한)': 5,
+  '객관식': 6,
 };
 
 export default function DetailedTab() {
@@ -121,11 +132,10 @@ export default function DetailedTab() {
             grouped[tester] = {
               weekly: [],
               daily: {},
-              totalTesterCount: 0 // 초기화
+              totalTesterCount: 0
             };
           }
 
-          // 수험자별 전체 API 데이터 건수 카운트 증가
           grouped[tester].totalTesterCount += 1;
 
           if (!grouped[tester].daily[date]) {
@@ -153,6 +163,20 @@ export default function DetailedTab() {
             weeklySummary.maxScore = score;
             weeklySummary.status = status;
           }
+        });
+
+        // ⭐️ 설정한 우선순위에 따라 weekly 및 daily 배열 정렬 수행
+        const sortItems = (a: DetailSummaryItem, b: DetailSummaryItem) => {
+          const pA = modePriority[a.title] ?? 99; // 정의되지 않은 항목은 맨 뒤로 배치
+          const pB = modePriority[b.title] ?? 99;
+          return pA - pB;
+        };
+
+        Object.keys(grouped).forEach((tester) => {
+          grouped[tester].weekly.sort(sortItems);
+          Object.keys(grouped[tester].daily).forEach((date) => {
+            grouped[tester].daily[date].sort(sortItems);
+          });
         });
 
         setGroupedData(grouped);
@@ -184,13 +208,6 @@ export default function DetailedTab() {
     setCurrentDate(new Date());
   };
 
-  const getScoreColor = (score: number) => {
-    if (score === 100) return 'text-red-500';      
-    if (score > 80 && score < 100) return 'text-green-600'; 
-    if (score >= 60 && score <= 80) return 'text-blue-500';  
-    return 'text-gray-400'; 
-  };
-
   return (
     <div className="flex flex-col h-[calc(100vh-100px)]">
       {/* 상단 고정 영역 */}
@@ -202,7 +219,6 @@ export default function DetailedTab() {
             onNext={handleNextWeek}
             onThisWeek={handleThisWeek}
           />
-          {/* ⭐️ UserSelectFilter와 독립된 돋보기 버튼 가로 배치 */}
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <UserSelectFilter
@@ -214,7 +230,6 @@ export default function DetailedTab() {
             
             <button
               onClick={fetchExamStatus}
-              /* ⭐️ 사이즈 수정됨: w-11 h-11 -> w-[42px] h-[42px] (수험자 콤보박스 높이와 일치) */
               className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
               title="조회"
             >
@@ -234,7 +249,6 @@ export default function DetailedTab() {
               </svg>
             </button>
           </div>
-
         </div>
       </div>
 
@@ -248,7 +262,6 @@ export default function DetailedTab() {
           Object.entries(groupedData).map(([tester, data]) => (
             <div key={tester} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 space-y-5">
               
-              {/* 수험자 이름 헤더 (수험자별 총 건수로 표기 변경) */}
               <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                 <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-600"></span>

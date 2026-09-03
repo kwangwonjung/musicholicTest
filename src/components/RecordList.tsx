@@ -1,5 +1,6 @@
 // src/components/RecordList.tsx
 import type { RecordType } from '../types/record';
+import { getScoreColor } from '../utils/scoreUtils'; // 공통 유틸 함수 임포트
 
 interface RecordListProps {
   records: RecordType[];
@@ -16,13 +17,6 @@ export default function RecordList({
   onUserChange, 
   onStatusToggle 
 }: RecordListProps) {
-  const getScoreColor = (score: number) => {
-    if (score === 100) return 'text-red-500';      
-    if (score > 80 && score < 100) return 'text-green-600'; 
-    if (score >= 60 && score <= 80) return 'text-blue-500';  
-    return 'text-gray-400'; 
-  };
-
   return (
     <div className="space-y-3">
       {records.map((record) => (
@@ -57,10 +51,10 @@ export default function RecordList({
           {/* 우측 상세 정보 영역 */}
           <div className="flex-1 flex items-center justify-between gap-2 text-xs min-w-0">
             
-            {/* 1열: 모드 + 시험 제목 (truncate 제거 및 break-all 적용) */}
+            {/* 1열: 모드 + 시험 제목 */}
             <div className="flex flex-col gap-1 items-start flex-1 min-w-0 pr-2">
               <span className="font-semibold text-gray-500 bg-gray-100 px-2 py-0.5 rounded whitespace-nowrap">
-                {record.mode || record.mode || '-'}
+                {record.mode || '-'}
               </span>
               <div className="text-gray-700 font-medium text-[13px] break-all w-full text-left">
                 {record.title}
@@ -69,7 +63,7 @@ export default function RecordList({
 
             {/* 2열: 점수 + 시간 */}
             <div className="flex flex-col gap-1 items-start w-[60px] pl-2 shrink-0 whitespace-nowrap">
-              <span className={`font-bold text-sm ${getScoreColor(record.score)}`}>
+              <span className={`font-bold text-sm ${getScoreColor(Number(record.score) || 0)}`}>
                 {record.score}점
               </span>
               <span className="text-gray-400 text-xs">
@@ -78,9 +72,9 @@ export default function RecordList({
             </div>
 
             {/* 3열: 힌트 + 상태 뱃지 */}
-            <div className="flex flex-col gap-1 items-end w-[50px]  pl-4 shrink-0 whitespace-nowrap">
+            <div className="flex flex-col gap-1 items-end w-[50px] pl-4 shrink-0 whitespace-nowrap">
               <span className="text-gray-500 text-xs">
-                H: {record.hintCnt ?? record.hintCnt ?? 0}
+                H: {record.hintCnt ?? 0}
               </span>
               <div>
                 <button
