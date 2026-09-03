@@ -20,7 +20,6 @@ interface ApiResponseItem {
   USE_YN: string;
   MODE: string;
   HINT_CNT: number;
-
 }
 
 const getWeekBoundaries = (date: Date) => {
@@ -46,10 +45,19 @@ const formatDate = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
+// URL의 쿼리 파라미터에서 tester 값을 가져오는 헬퍼 함수
+const getInitialUser = () => {
+  const params = new URLSearchParams(window.location.search);
+  const tester = params.get('tester');
+  return tester ? tester : '전체 수험자';
+};
+
 export default function WeeklyTab() {
   const [status, setStatus] = useState('전체');
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedUser, setSelectedUser] = useState('전체 수험자');
+  
+  // ⭐️ URL 쿼리 파라미터의 tester 값을 초기값으로 설정
+  const [selectedUser, setSelectedUser] = useState(getInitialUser);
   
   const [records, setRecords] = useState<RecordType[]>([]);
   const [originalRecords, setOriginalRecords] = useState<RecordType[]>([]); 
@@ -232,7 +240,7 @@ export default function WeeklyTab() {
             onThisWeek={handleThisWeek}
           />
           
-          {/* ⭐️ UserSelectFilter와 독립된 돋보기 버튼 가로 배치 */}
+          {/* UserSelectFilter와 독립된 돋보기 버튼 가로 배치 */}
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <UserSelectFilter
@@ -244,7 +252,6 @@ export default function WeeklyTab() {
             
             <button
               onClick={fetchExamStatus}
-              /* ⭐️ 사이즈 수정됨: w-11 h-11 -> w-[42px] h-[42px] (수험자 콤보박스 높이와 일치) */
               className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
               title="조회"
             >
@@ -264,7 +271,6 @@ export default function WeeklyTab() {
               </svg>
             </button>
           </div>
-          {/* ---------------------------------------------------- */}
           
         </div>
 
