@@ -28,7 +28,7 @@ export default function MonthlyDetailLayer({ isOpen, onClose, year, month, day, 
 
         const payload = {
           startDate,
-          tester: selectedUser === '전체 수험자' ? '정진명' : selectedUser,
+          tester: selectedUser,
         };
 
         const res = await fetch(`${API_BASE_URL}/api/examstatus/selectMonthlyLayer`, {
@@ -66,9 +66,9 @@ export default function MonthlyDetailLayer({ isOpen, onClose, year, month, day, 
               📅
             </div>
             <div>
-              <h3 className="font-bold text-gray-800 text-sm">{selectedUser}님의 {year}년 {month}월 {day}일 풀이 내역</h3>
+              <h3 className="font-bold text-gray-800 text-sm">{selectedUser}님의 풀이 내역</h3>
               <p className="text-[11px] text-gray-400 mt-0.5">
-                {loading ? '불러오는 중...' : `총 ${solveList.length}개의 풀이 내역이 있습니다.`}
+                {loading ? '불러오는 중...' : `${year}년 ${month}월 ${day}일에 총 ${solveList.length}개의 풀이 내역`}
               </p>
             </div>
           </div>
