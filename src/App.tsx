@@ -3,6 +3,8 @@ import { useState } from 'react';
 import WeeklyTab from './exam/WeeklyTab'; 
 import MonthlyTab from './exam/MonthlyTab'; 
 import DetailTab from './exam/DetailTab';  
+import PeriodTab from './exam/PeriodTab';  
+
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'주별' | '요약' | '월별' | '기간별'>('주별');
@@ -57,6 +59,7 @@ export default function App() {
       {activeTab === '주별' && <WeeklyTab />}
       {activeTab === '요약' && <DetailTab />}
       {activeTab === '월별' && <MonthlyTab />}
+      {activeTab === '기간별' && <PeriodTab />}
     </main>
   );
 }
