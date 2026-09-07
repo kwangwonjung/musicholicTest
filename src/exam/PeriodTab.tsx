@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const formatDate = (date: Date) => {
   const year = date.getFullYear();
@@ -9,66 +8,21 @@ const formatDate = (date: Date) => {
 };
 
 interface SubjectItem {
-  subjectName: string;
-  avgScore: number;
-  solveCount: number;
-  uniqueDays: number;
-  maxScore: number;
-  hintMax: number;
-  minScore: number;
-  hintMin: number;
+  TEST_GRP_NM: string;
+  AVG_SCORE: number;
+  SOLVE_CNT: number;
+  UNIQUE_DAYS: number;
+  MAX_SCORE: number;
+  HINT_MAX: number;
+  MIN_SCORE: number;
+  HINT_MIN: number;
 }
 
 interface TesterGroup {
-  tester: string;
-  totalCount: number;
+  TESTER: string;
+  TOTAL_CNT: number;
   subjects: SubjectItem[];
 }
-
-const initialTesterGroups: TesterGroup[] = [
-  {
-    tester: '정민규',
-    totalCount: 19,
-    subjects: [
-      {
-        subjectName: '800.42. 초등사+사이트 워드',
-        avgScore: 100,
-        solveCount: 28,
-        uniqueDays: 28,
-        maxScore: 100,
-        hintMax: 322,
-        minScore: 100,
-        hintMin: 10,
-      },
-      {
-        subjectName: '800.43. 중등사+핵심 워드',
-        avgScore: 95,
-        solveCount: 15,
-        uniqueDays: 12,
-        maxScore: 98,
-        hintMax: 210,
-        minScore: 80,
-        hintMin: 5,
-      },
-    ],
-  },
-  {
-    tester: '정진명',
-    totalCount: 12,
-    subjects: [
-      {
-        subjectName: '700.10. 기본 단어 완성',
-        avgScore: 88,
-        solveCount: 12,
-        uniqueDays: 10,
-        maxScore: 95,
-        hintMax: 150,
-        minScore: 70,
-        hintMin: 2,
-      },
-    ],
-  },
-];
 
 export default function PeriodTab() {
   const [criteria, setCriteria] = useState('과목별');
@@ -85,25 +39,43 @@ export default function PeriodTab() {
 
   const [subjectQuery, setSubjectQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState('전체 수험자');
+  const [testerGroups, setTesterGroups] = useState<TesterGroup[]>([]);
 
   const userList = ['전체 수험자', '정진명', '정민규', '강지원', '강지우', '언노운'];
 
-  // 필터링 로직 적용
-  const filteredGroups = initialTesterGroups
-    .map(group => {
-      if (selectedUser !== '전체 수험자' && group.tester !== selectedUser) {
-        return null;
+  const fetchTestData = async () => {
+
+    
+    
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+      
+      const response = await fetch(`${API_BASE_URL}/api/examstatus/selectPeriod`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+          mode: criteria === '과목별' ? 'subject' : 'detail',
+          startDate,
+          endDate,
+          tester: selectedUser === '전체 수험자' ? '' : selectedUser,
+          testGrpNm: subjectQuery,
+          })
+        });
+      
+      const result = await response.json();
+      if (result.success) {
+        setTesterGroups(result.data);
+      } else {
+        console.error('데이터 조회 실패:', result.message);
       }
-      const filteredSubjects = group.subjects.filter(sub =>
-        sub.subjectName.toLowerCase().includes(subjectQuery.toLowerCase())
-      );
-      if (filteredSubjects.length === 0) return null;
-      return {
-        ...group,
-        subjects: filteredSubjects,
-      };
-    })
-    .filter(Boolean) as TesterGroup[];
+    } catch (error) {
+      console.error('API 요청 오류:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTestData();
+  }, []);
 
   return (
     <div className="flex flex-col h-[calc(100vh-100px)]">
@@ -184,6 +156,7 @@ export default function PeriodTab() {
             </div>
             <button
               type="button"
+              onClick={fetchTestData}
               className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer"
               title="조회"
             >
@@ -198,17 +171,17 @@ export default function PeriodTab() {
 
       {/* 하단 결과 리스트 영역 */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 pb-4 space-y-4">
-        {filteredGroups.length > 0 ? (
-          filteredGroups.map((group, gIdx) => (
+        {testerGroups.length > 0 ? (
+          testerGroups.map((group, gIdx) => (
             <div key={gIdx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
               {/* 수험자 그룹 헤더 */}
               <div className="flex justify-between items-center border-b border-gray-100 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                  <span className="font-bold text-gray-800 text-sm">{group.tester}</span>
+                  <span className="font-bold text-gray-800 text-sm">{group.TESTER}</span>
                 </div>
                 <div className="text-xs font-medium text-gray-500">
-                  총 건수: <span className="font-bold text-gray-800">{group.totalCount}건</span>
+                  총 건수: <span className="font-bold text-gray-800">{group.TOTAL_CNT}건</span>
                 </div>
               </div>
 
@@ -218,7 +191,7 @@ export default function PeriodTab() {
                   <div key={sIdx} className="bg-gray-50/60 rounded-xl p-3 border border-gray-200/60 space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-blue-900 text-xs sm:text-sm flex-1 min-w-0 break-words pr-2">
-                        {sub.subjectName}
+                        {sub.TEST_GRP_NM}
                       </span>
                       <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 shrink-0">
                         <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -226,7 +199,7 @@ export default function PeriodTab() {
                           <circle cx="12" cy="12" r="5" strokeWidth="2" />
                           <circle cx="12" cy="12" r="1.5" fill="currentColor" />
                         </svg>
-                        <span>평균 {sub.avgScore}점</span>
+                        <span>평균 {sub.AVG_SCORE}점</span>
                       </div>
                     </div>
 
@@ -240,7 +213,7 @@ export default function PeriodTab() {
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">풀이</div>
-                            <div className="font-bold text-gray-800">{sub.solveCount}</div>
+                            <div className="font-bold text-gray-800">{sub.SOLVE_CNT}</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -249,7 +222,7 @@ export default function PeriodTab() {
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">일수</div>
-                            <div className="font-bold text-gray-800">{sub.uniqueDays}</div>
+                            <div className="font-bold text-gray-800">{sub.UNIQUE_DAYS}</div>
                           </div>
                         </div>
                       </div>
@@ -262,18 +235,17 @@ export default function PeriodTab() {
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">최고점</div>
-                            <div className="font-bold text-gray-800">{sub.maxScore}점</div>
+                            <div className="font-bold text-gray-800">{sub.MAX_SCORE}점</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {/* 힌트 MAX 아이콘 (수직 중앙 정렬 조정: text y를 14로 수정) */}
                           <svg className="w-4 h-4 shrink-0 block" viewBox="0 0 24 24" width="16" height="16">
                             <path fill="#e11d48" d="M12 1l1.8 2.3 2.9-.6 1 2.8 2.8 1-.6 2.9 2.3 1.8-1.8 2.3.6 2.9-2.8 1-1 2.8-2.9-.6-1.8 2.3-1.8-2.3-2.9.6-1-2.8-2.8-1 .6-2.9-2.3-1.8 1.8-2.3-.6-2.9 2.8-1 1-2.8 2.9.6L12 1z"/>
                             <text x="12" y="14" fill="#ffffff" fontSize="6.5" fontWeight="900" textAnchor="middle">MAX</text>
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">힌트</div>
-                            <div className="font-bold text-gray-800">{sub.hintMax}</div>
+                            <div className="font-bold text-gray-800">{sub.HINT_MAX}</div>
                           </div>
                         </div>
                       </div>
@@ -281,25 +253,23 @@ export default function PeriodTab() {
                       {/* 3열: 최저점 / 힌트 MIN */}
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          {/* 최저점 아이콘 (파란색 슬픈 표정) */}
                           <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <circle cx="12" cy="12" r="9" strokeWidth="2" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10h.01M15 10h.01M9 15c1.5-1 4.5-1 6 0" />
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">최저점</div>
-                            <div className="font-bold text-gray-800">{sub.minScore}점</div>
+                            <div className="font-bold text-gray-800">{sub.MIN_SCORE}점</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {/* 힌트 MIN 아이콘 (수직 중앙 정렬 조정: text y를 14로 수정) */}
                           <svg className="w-4 h-4 shrink-0 block" viewBox="0 0 24 24" width="16" height="16">
                             <path fill="#16a34a" d="M12 1l1.8 2.3 2.9-.6 1 2.8 2.8 1-.6 2.9 2.3 1.8-1.8 2.3.6 2.9-2.8 1-1 2.8-2.9-.6-1.8 2.3-1.8-2.3-2.9.6-1-2.8-2.8-1 .6-2.9-2.3-1.8 1.8-2.3-.6-2.9 2.8-1 1-2.8 2.9.6L12 1z"/>
                             <text x="12" y="14" fill="#ffffff" fontSize="6.5" fontWeight="900" textAnchor="middle">MIN</text>
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">힌트</div>
-                            <div className="font-bold text-gray-800">{sub.hintMin}</div>
+                            <div className="font-bold text-gray-800">{sub.HINT_MIN}</div>
                           </div>
                         </div>
                       </div>
