@@ -8,6 +8,7 @@ const formatDate = (date: Date) => {
 };
 
 interface SubjectItem {
+  MODE?: string;
   TEST_GRP_NM: string;
   AVG_SCORE: number;
   SOLVE_CNT: number;
@@ -44,9 +45,6 @@ export default function PeriodTab() {
   const userList = ['전체 수험자', '정진명', '정민규', '강지원', '강지우', '언노운'];
 
   const fetchTestData = async () => {
-
-    
-    
     try {
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
       
@@ -54,11 +52,11 @@ export default function PeriodTab() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-          mode: criteria === '과목별' ? 'subject' : 'detail',
-          startDate,
-          endDate,
-          tester: selectedUser === '전체 수험자' ? '' : selectedUser,
-          testGrpNm: subjectQuery,
+            mode: criteria === '과목별' ? 'subject' : 'detail',
+            startDate,
+            endDate,
+            tester: selectedUser === '전체 수험자' ? '' : selectedUser,
+            testGrpNm: subjectQuery,
           })
         });
       
@@ -189,10 +187,17 @@ export default function PeriodTab() {
               <div className="space-y-3 pt-1">
                 {group.subjects.map((sub, sIdx) => (
                   <div key={sIdx} className="bg-gray-50/60 rounded-xl p-3 border border-gray-200/60 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-blue-900 text-xs sm:text-sm flex-1 min-w-0 break-words pr-2">
-                        {sub.TEST_GRP_NM}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        {sub.MODE && (
+                          <span className="shrink-0 px-2 py-0.5 bg-gray-200/80 text-gray-700 text-[11px] font-medium rounded-md">
+                            {sub.MODE}
+                          </span>
+                        )}
+                        <span className="font-bold text-blue-900 text-xs sm:text-sm truncate">
+                          {sub.TEST_GRP_NM}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1.5 text-xs font-bold text-red-600 shrink-0">
                         <svg className="w-4 h-4 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <circle cx="12" cy="12" r="9" strokeWidth="2" />
