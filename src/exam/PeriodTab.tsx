@@ -1,4 +1,4 @@
-// src/exam/PeriodTab.tsx
+
 import { useState } from 'react';
 
 const formatDate = (date: Date) => {
@@ -196,7 +196,7 @@ export default function PeriodTab() {
         </div>
       </div>
 
-      {/* 하단 결과 리스트 영역 (수험자별 그룹핑 및 하단 카드 레이아웃 적용) */}
+      {/* 하단 결과 리스트 영역 */}
       <div className="flex-1 overflow-y-auto min-h-0 pr-1 pb-4 space-y-4">
         {filteredGroups.length > 0 ? (
           filteredGroups.map((group, gIdx) => (
@@ -266,11 +266,13 @@ export default function PeriodTab() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                          {/* 힌트 MAX 아이콘 (수직 중앙 정렬 조정: text y를 14로 수정) */}
+                          <svg className="w-4 h-4 shrink-0 block" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="#e11d48" d="M12 1l1.8 2.3 2.9-.6 1 2.8 2.8 1-.6 2.9 2.3 1.8-1.8 2.3.6 2.9-2.8 1-1 2.8-2.9-.6-1.8 2.3-1.8-2.3-2.9.6-1-2.8-2.8-1 .6-2.9-2.3-1.8 1.8-2.3-.6-2.9 2.8-1 1-2.8 2.9.6L12 1z"/>
+                            <text x="12" y="14" fill="#ffffff" fontSize="6.5" fontWeight="900" textAnchor="middle">MAX</text>
                           </svg>
                           <div>
-                            <div className="text-gray-400 text-[10px]">힌트 MAX</div>
+                            <div className="text-gray-400 text-[10px]">힌트</div>
                             <div className="font-bold text-gray-800">{sub.hintMax}</div>
                           </div>
                         </div>
@@ -279,8 +281,10 @@ export default function PeriodTab() {
                       {/* 3열: 최저점 / 힌트 MIN */}
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
+                          {/* 최저점 아이콘 (파란색 슬픈 표정) */}
                           <svg className="w-4 h-4 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 21h8m-4-4v4m0-4a4 4 0 100-8 4 4 0 000 8zm-6-9h2a2 2 0 002-2V5a2 2 0 00-2-2H4a2 2 0 00-2 2v2a2 2 0 002 2zm16 0h-2a2 2 0 01-2-2V5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2z" />
+                            <circle cx="12" cy="12" r="9" strokeWidth="2" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10h.01M15 10h.01M9 15c1.5-1 4.5-1 6 0" />
                           </svg>
                           <div>
                             <div className="text-gray-400 text-[10px]">최저점</div>
@@ -288,11 +292,13 @@ export default function PeriodTab() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          {/* 힌트 MIN 아이콘 (수직 중앙 정렬 조정: text y를 14로 수정) */}
+                          <svg className="w-4 h-4 shrink-0 block" viewBox="0 0 24 24" width="16" height="16">
+                            <path fill="#16a34a" d="M12 1l1.8 2.3 2.9-.6 1 2.8 2.8 1-.6 2.9 2.3 1.8-1.8 2.3.6 2.9-2.8 1-1 2.8-2.9-.6-1.8 2.3-1.8-2.3-2.9.6-1-2.8-2.8-1 .6-2.9-2.3-1.8 1.8-2.3-.6-2.9 2.8-1 1-2.8 2.9.6L12 1z"/>
+                            <text x="12" y="14" fill="#ffffff" fontSize="6.5" fontWeight="900" textAnchor="middle">MIN</text>
                           </svg>
                           <div>
-                            <div className="text-gray-400 text-[10px]">힌트 MIN</div>
+                            <div className="text-gray-400 text-[10px]">힌트</div>
                             <div className="font-bold text-gray-800">{sub.hintMin}</div>
                           </div>
                         </div>
