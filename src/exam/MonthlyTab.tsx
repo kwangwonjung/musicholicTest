@@ -1,7 +1,8 @@
 // src/exam/MonthlyTab.tsx
 import { useState, useEffect, useCallback } from 'react';
 import UserSelectFilter from '../components/UserSelectFilter';
-import MonthlyDetailLayer from '../exam/MonthlyDetailLayer'; // 모달 컴포넌트 임포트
+import MonthlyDetailLayer from '../exam/MonthlyDetailLayer';
+import MonthlySubjectLayer from './MonthlySubjectLayer'; // 과목 수 상세 레이어 임포트
 
 export default function MonthlyTab() {
   const [selectedUser, setSelectedUser] = useState('정진명');
@@ -24,9 +25,12 @@ export default function MonthlyTab() {
   const [summary, setSummary] = useState({ total_solves: 0, unique_subjects: 0, attendance_days: 0 });
   const [loading, setLoading] = useState(false);
 
-  // 모달 팝업 상태 및 선택된 날짜 관리
+  // 날짜별 상세 모달 팝업 상태 및 선택된 날짜 관리
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState(1);
+
+  // 과목 수 상세 모달 팝업 상태 관리
+  const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
 
   const userList = ['정진명', '정민규', '강지원', '강지우', '언노운'];
 
@@ -139,18 +143,18 @@ export default function MonthlyTab() {
             className="shrink-0 flex items-center justify-center w-[36px] h-[36px] bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors cursor-pointer disabled:opacity-50"
             title="조회"
           >
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              className="h-5 w-5" 
-              fill="none" 
-              viewBox="0 0 24 24" 
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               />
             </svg>
           </button>
@@ -165,7 +169,11 @@ export default function MonthlyTab() {
             <span className="text-sm font-bold text-blue-600">{summary.total_solves}회</span>
           </div>
 
-          <div className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3 flex flex-col items-center justify-center">
+          {/* 과목 수 카드 (클릭 시 MonthlySubjectLayer 오픈) */}
+          <div 
+            onClick={() => setIsSubjectModalOpen(true)}
+            className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-100/40 transition-colors"
+          >
             <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center mb-1 text-emerald-600">
               📖
             </div>
@@ -262,13 +270,22 @@ export default function MonthlyTab() {
         </div>
       </div>
 
-      {/* 분리된 레이어 팝업 컴포넌트 */}
+      {/* 날짜별 상세 레이어 팝업 컴포넌트 */}
       <MonthlyDetailLayer
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         year={year}
         month={month}
         day={selectedDay}
+        selectedUser={selectedUser}
+      />
+
+      {/* 과목 수 상세 레이어 팝업 컴포넌트 */}
+      <MonthlySubjectLayer
+        isOpen={isSubjectModalOpen}
+        onClose={() => setIsSubjectModalOpen(false)}
+        year={year}
+        month={month}
         selectedUser={selectedUser}
       />
     </div>
