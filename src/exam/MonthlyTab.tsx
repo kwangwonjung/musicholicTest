@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import UserSelectFilter from '../components/UserSelectFilter';
 import MonthlyDetailLayer from '../exam/MonthlyDetailLayer';
 import MonthlySubjectLayer from './MonthlySubjectLayer'; // 과목 수 상세 레이어 임포트
+import MonthlySolveCountLayer from './MonthlySolveCountLayer'; // 총 풀이 횟수 상세 레이어 임포트[cite: 3]
 
 export default function MonthlyTab() {
   const [selectedUser, setSelectedUser] = useState('정진명');
@@ -31,6 +32,9 @@ export default function MonthlyTab() {
 
   // 과목 수 상세 모달 팝업 상태 관리
   const [isSubjectModalOpen, setIsSubjectModalOpen] = useState(false);
+
+  // 총 풀이 횟수 상세 모달 팝업 상태 관리
+  const [isSolveModalOpen, setIsSolveModalOpen] = useState(false);
 
   const userList = ['정진명', '정민규', '강지원', '강지우', '언노운'];
 
@@ -161,7 +165,11 @@ export default function MonthlyTab() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 pt-1">
-          <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex flex-col items-center justify-center">
+          {/* 총 풀이 횟수 카드 (클릭 시 MonthlySolveCountLayer 오픈) */}
+          <div 
+            onClick={() => setIsSolveModalOpen(true)}
+            className="bg-blue-50/50 border border-blue-100 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100/40 transition-colors"
+          >
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mb-1 text-blue-600">
               📄
             </div>
@@ -256,7 +264,7 @@ export default function MonthlyTab() {
             <span>1회 이상</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+            <span className="w-2.5 h-2 bg-orange-500 rounded-full"></span>
             <span>출석</span>
           </div>
         </div>
@@ -284,6 +292,15 @@ export default function MonthlyTab() {
       <MonthlySubjectLayer
         isOpen={isSubjectModalOpen}
         onClose={() => setIsSubjectModalOpen(false)}
+        year={year}
+        month={month}
+        selectedUser={selectedUser}
+      />
+
+      {/* 총 풀이 횟수 상세 레이어 팝업 컴포넌트 */}
+      <MonthlySolveCountLayer
+        isOpen={isSolveModalOpen}
+        onClose={() => setIsSolveModalOpen(false)}
         year={year}
         month={month}
         selectedUser={selectedUser}
