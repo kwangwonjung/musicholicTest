@@ -8,18 +8,18 @@ import MonthlySolveCountLayer from './MonthlySolveCountLayer'; // 총 풀이 횟
 export default function MonthlyTab() {
   const [selectedUser, setSelectedUser] = useState('정진명');
   
-  // 20일 기준 디폴트 월 설정 (20일 초과: 현재월, 20일 이하: 전월)
+  // 이번 주 월요일을 기준으로 디폴트 월 설정
   const [currentDate, setCurrentDate] = useState(() => {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth(); // 0-indexed (0~11)
-    const day = now.getDate();
+    const dayOfWeek = now.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+    
+    // 월요일과의 날짜 차이 계산 (일요일인 경우 지난주 월요일로 6일 전 계산)
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    
+    const monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
 
-    if (day > 20) {
-      return new Date(year, month, 1);
-    } else {
-      return new Date(year, month - 1, 1);
-    }
+    return new Date(monday.getFullYear(), monday.getMonth(), 1);
   });
 
   const [calendarDays, setCalendarDays] = useState<any[]>([]);
